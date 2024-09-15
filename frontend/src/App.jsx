@@ -1,34 +1,41 @@
-import React from "react"
-import { Routes, Route, Navigate } from "react-router-dom"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import SignUp from "./pages/SignUp"
+// Example in Login.jsx
+// Example in Login.jsx
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
-import { Toaster } from "react-hot-toast"
-import { useAuthContext } from "./context/AuthContext"
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-const App = () => {
-  const { authUser } = useAuthContext()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const data = await response.json();
+        // Handle successful login
+      } else {
+        throw new Error("Received non-JSON response");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      toast.error("Login failed");
+    }
+  };
 
   return (
-    <div className="p-4 h-screen flex items-center justify-center">
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <Home /> : <Navigate to={"/login"} />}
-        />
-        <Route
-          path="/login"
-          element={authUser ? <Navigate to={"/"} /> : <Login />}
-        />
-        <Route
-          path="/signup"
-          element={authUser ? <Navigate to={"/"} /> : <SignUp />}
-        />
-      </Routes>
-      <Toaster />
-    </div>
-  )
-}
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+    </form>
+  );
+};
 
-export default App
+export default Login;
